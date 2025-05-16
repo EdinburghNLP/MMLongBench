@@ -2,7 +2,7 @@
 
 ---
 
-
+Our arXiv paper will be available online soon. Thank you for your patience.
 <p align="center">
 <a href="https://huggingface.co/datasets/ZhaoweiWang/MMLongBench/blob/main/README.md" target="_blank" rel="noopener noreferrer">
         <img alt="paper" src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset-blue">
@@ -151,8 +151,17 @@ We can easily change them to meet your own requirements.
 For any questions, please email `zwanggy@cse.ust.hk`.
 
 
+## Citation
+Our arXiv paper will be available online soon. Thank you for your patience.
+
+The author list of the work is:
+Zhaowei Wang, Wenhao Yu, Xiyu REN, Jipeng Zhang, Yu Zhao, Rohit Saxena, Liang Cheng, Ginny Wong, Simon See, Pasquale Minervini, Yangqiu Song, Mark Steedman
+
 ## Acknowledgment
 The code is built based on [HELMET](https://github.com/princeton-nlp/HELMET/tree/main).
 We revised a lot to evaluation LVLMs, including configs, arguments, eval.py, metrics, data loading.
 The most difference is that since LVLMs have non-unified function API, we write a script for each model in ```vlm_model```
+
+## Misuse for malicious purposes
+This dataset is constructed to support the development of Long-Context Vision-Language Models. It is strictly forbidden to use this dataset for other usage with high risk, such as generating or disseminating false, misleading, or harmful content, or for activities involving privacy violation, fraud, discrimination, harassment, violence, pornography, or any illegal purposes. Users must not use this dataset to train, fine-tune, or deploy any models or applications that violate laws, regulations, or ethical standards. By using this dataset, you agree to bear all legal and ethical responsibilities resulting from any misuse.
 
