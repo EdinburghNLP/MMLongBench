@@ -1,0 +1,6 @@
+input_max_length: 8192,16384,32768,65536,131072,8192,16384,32768,65536,131072,8192,16384,32768,65536,131072
+datasets: longdocurl,longdocurl,longdocurl,longdocurl,longdocurl,mmlongdoc,mmlongdoc,mmlongdoc,mmlongdoc,mmlongdoc,slidevqa,slidevqa,slidevqa,slidevqa,slidevqa
+generation_max_length: 128,128,128,128,128,128,128,128,128,128,128,128,128,128,128
+test_files: documentQA/longdocurl_K8.jsonl,documentQA/longdocurl_K16.jsonl,documentQA/longdocurl_K32.jsonl,documentQA/longdocurl_K64.jsonl,documentQA/longdocurl_K128.jsonl,documentQA/mmlongdoc_K8.jsonl,documentQA/mmlongdoc_K16.jsonl,documentQA/mmlongdoc_K32.jsonl,documentQA/mmlongdoc_K64.jsonl,documentQA/mmlongdoc_K128.jsonl,documentQA/slidevqa_K8.jsonl,documentQA/slidevqa_K16.jsonl,documentQA/slidevqa_K32.jsonl,documentQA/slidevqa_K64.jsonl,documentQA/slidevqa_K128.jsonl
+use_chat_template: true
+max_test_samples: 100

@@ -1,0 +1,6 @@
+input_max_length: 8192,16384,32768,65536,131072,8192,16384,32768,65536,131072,8192,16384,32768,65536,131072,8192,16384,32768,65536,131072
+datasets: cars196,cars196,cars196,cars196,cars196,food101,food101,food101,food101,food101,inat2021,inat2021,inat2021,inat2021,inat2021,sun397,sun397,sun397,sun397,sun397
+generation_max_length: 128,128,128,128,128,128,128,128,128,128,128,128,128,128,128,128,128,128,128,128
+test_files: ICL/cars196_K8.json,ICL/cars196_K16.json,ICL/cars196_K32.json,ICL/cars196_K64.json,ICL/cars196_K128.json,ICL/food101_K8.json,ICL/food101_K16.json,ICL/food101_K32.json,ICL/food101_K64.json,ICL/food101_K128.json,ICL/inat2021_K8.json,ICL/inat2021_K16.json,ICL/inat2021_K32.json,ICL/inat2021_K64.json,ICL/inat2021_K128.json,ICL/sun397_K8.json,ICL/sun397_K16.json,ICL/sun397_K32.json,ICL/sun397_K64.json,ICL/sun397_K128.json
+use_chat_template: true
+max_test_samples: 100

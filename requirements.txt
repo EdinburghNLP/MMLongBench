@@ -1,0 +1,20 @@
+rouge_score==0.1.2
+transformers==4.49.0 # Gemma3 needs 4.50
+datasets==3.1.0
+accelerate==1.2.0
+peft==0.15.0
+flash_attn==2.7.4.post1
+torch==2.6.0
+torchvision==0.21.0
+qwen_vl_utils==0.0.10 # for qwen2
+transformers-stream-generator==0.0.4
+autoawq==0.2.7.post3 # qwen2-awq
+backoff # internvl, phi 4
+timm # internvl
+sentencepiece # internvl
+einops # phi, NVila
+openai==1.73.0 # openai and anthropic
+google-genai # google gemini
+git+https://github.com/bfshi/scaling_on_scales.git # NVila
+imageio # for v2pe
+decord # for v2pe

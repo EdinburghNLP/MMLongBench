@@ -1,0 +1,6 @@
+input_max_length: 8192,16384,32768,65536,131072,8192,16384,32768,65536,131072,8192,16384,32768,65536,131072
+datasets: mm_niah_retrieval-text,mm_niah_retrieval-text,mm_niah_retrieval-text,mm_niah_retrieval-text,mm_niah_retrieval-text,mm_niah_counting-text,mm_niah_counting-text,mm_niah_counting-text,mm_niah_counting-text,mm_niah_counting-text,mm_niah_reasoning-text,mm_niah_reasoning-text,mm_niah_reasoning-text,mm_niah_reasoning-text,mm_niah_reasoning-text
+generation_max_length: 128,128,128,128,128,128,128,128,128,128,128,128,128,128,128
+test_files: NIAH/retrieval-text_test_K8_dep6.jsonl,NIAH/retrieval-text_test_K16_dep6.jsonl,NIAH/retrieval-text_test_K32_dep6.jsonl,NIAH/retrieval-text_test_K64_dep6.jsonl,NIAH/retrieval-text_test_K128_dep6.jsonl,NIAH/counting-text_test_K8_dep3.jsonl,NIAH/counting-text_test_K16_dep3.jsonl,NIAH/counting-text_test_K32_dep3.jsonl,NIAH/counting-text_test_K64_dep3.jsonl,NIAH/counting-text_test_K128_dep3.jsonl,NIAH/reasoning-text_test_K8_dep3.jsonl,NIAH/reasoning-text_test_K16_dep3.jsonl,NIAH/reasoning-text_test_K32_dep3.jsonl,NIAH/reasoning-text_test_K64_dep3.jsonl,NIAH/reasoning-text_test_K128_dep3.jsonl
+use_chat_template: true
+max_test_samples: 50

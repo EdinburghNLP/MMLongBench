@@ -1,0 +1,6 @@
+input_max_length: 8192,16384,32768,65536,131072,8192,16384,32768,65536,131072
+datasets: infoseek,infoseek,infoseek,infoseek,infoseek,viquae,viquae,viquae,viquae,viquae
+generation_max_length: 128,128,128,128,128,128,128,128,128,128
+test_files: vrag/infoseek_K8_dep3.jsonl,vrag/infoseek_K16_dep3.jsonl,vrag/infoseek_K32_dep3.jsonl,vrag/infoseek_K64_dep3.jsonl,vrag/infoseek_K128_dep3.jsonl,vrag/viquae_K8_dep6.jsonl,vrag/viquae_K16_dep6.jsonl,vrag/viquae_K32_dep6.jsonl,vrag/viquae_K64_dep6.jsonl,vrag/viquae_K128_dep6.jsonl
+use_chat_template: true
+max_test_samples: 100

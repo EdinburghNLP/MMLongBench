@@ -1,0 +1,6 @@
+input_max_length: 8192,16384,32768,65536,131072,8192,16384,32768,65536,131072
+datasets: gov-report,gov-report,gov-report,gov-report,gov-report,multi-lexsum,multi-lexsum,multi-lexsum,multi-lexsum,multi-lexsum
+generation_max_length: 384,384,384,384,384,384,384,384,384,384
+test_files: summ/gov_K8.jsonl,summ/gov_K16.jsonl,summ/gov_K32.jsonl,summ/gov_K64.jsonl,summ/gov_K128.jsonl,summ/lexsum_K8.jsonl,summ/lexsum_K16.jsonl,summ/lexsum_K32.jsonl,summ/lexsum_K64.jsonl,summ/lexsum_K128.jsonl
+use_chat_template: true
+max_test_samples: 100
