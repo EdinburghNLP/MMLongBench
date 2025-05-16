@@ -48,7 +48,7 @@ Please check ```vlm_model/gemini.py``` and ```vlm_model/openai_model.py``` for m
 <div align="center">
     <img src="assets/overview_page.jpg" alt="Model"/>
     <br>
-    <span>An illustration of our AbsInstruct Framework.</span>
+    <span>An overview of MMLongBench.</span>
 </div>
 
 Our benchmarks have two parts:
@@ -57,6 +57,7 @@ Our benchmarks have two parts:
 bash scripts/download_image_data.sh
 ```
 This will iteratively download the .tar.gz file of images for each task and then decompress it to the `mmlb_image` directory.
+
 2. You can download the text data with this command:
 ```
 wget -c https://huggingface.co/datasets/ZhaoweiWang/MMLongBench/resolve/main/mmlb_data.tar.gz
