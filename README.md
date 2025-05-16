@@ -159,7 +159,7 @@ Zhaowei Wang, Wenhao Yu, Xiyu REN, Jipeng Zhang, Yu Zhao, Rohit Saxena, Liang Ch
 
 ## Acknowledgment
 The code is built based on [HELMET](https://github.com/princeton-nlp/HELMET/tree/main).
-We revised a lot to evaluation LVLMs, including configs, arguments, eval.py, metrics, data loading.
+We revised a lot to evaluate LVLMs, including configs, arguments, eval.py, metrics, data loading.
 The most difference is that since LVLMs have non-unified function API, we write a script for each model in ```vlm_model```
 
 ## Misuse for malicious purposes
