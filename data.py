@@ -45,6 +45,16 @@ def load_vrag(args, path, max_test_samples=None):
     path = os.path.join(args.test_file_root, path)
     data = load_dataset("json", data_files=path)["train"]
 
+    # we find some images in viquae have double quotation marks in their names.
+    # such names are not supported by the NFS system.
+    original_size = len(data)
+    data = data.filter(
+        lambda sample: all('"' not in img_path for img_path in sample["image"]),
+        num_proc=args.preprocessing_num_workers
+    )
+    new_size = len(data)
+    print(f"Filtered out {original_size - new_size} samples with double quotes in image paths.")
+
     if max_test_samples is not None:
         key_list = set(data["id"])
         key_list = random.sample(sorted(key_list), min(max_test_samples, len(key_list)))
@@ -447,7 +457,7 @@ def load_doc_qa(args, path, max_test_samples=None):
 
     data = data.map(update, num_proc=args.preprocessing_num_workers)
 
-    def dcoqa_post_process(output, example):
+    def docqa_post_process(output, example):
         """
         Returns: metrics (dict) and additional info to update the original sample with (dict)
         """
@@ -464,7 +474,7 @@ def load_doc_qa(args, path, max_test_samples=None):
         "prompt_template": prompt_template,
         "user_template": user_template,
         "system_template": system_template,
-        "post_process": dcoqa_post_process
+        "post_process": docqa_post_process
     }
 
 
@@ -498,7 +508,7 @@ def load_text_doc_qa(args, path, max_test_samples=None):
 
     data = data.map(update, num_proc=args.preprocessing_num_workers)
 
-    def dcoqa_post_process(output, example):
+    def docqa_post_process(output, example):
         """
         Returns: metrics (dict) and additional info to update the original sample with (dict)
         """
@@ -515,7 +525,7 @@ def load_text_doc_qa(args, path, max_test_samples=None):
         "prompt_template": prompt_template,
         "user_template": user_template,
         "system_template": system_template,
-        "post_process": dcoqa_post_process
+        "post_process": docqa_post_process
     }
 
 

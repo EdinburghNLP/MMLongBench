@@ -1,6 +1,9 @@
 # MMLongBench: Benchmarking Long-Context Vision-Language Models Effectively and Thoroughly
 
 ---
+<p align="center">
+    <strong>[Sept 2025]</strong> 🎉 MMLongBench is accepted as a <span style="color:red; font-weight:bold;">spotlight</span> at NeurIPS 2025!!!
+</p>
 
 <p align="center">
     <a href="https://huggingface.co/datasets/ZhaoweiWang/MMLongBench/blob/main/README.md" target="_blank" rel="noopener noreferrer">
@@ -137,7 +140,7 @@ test_files, etc.
 
 <details>
 
-<summary>Check Missing Evaluation Tasks</summary>
+<summary>1. Check Missing Evaluation Tasks</summary>
 We provide a script to quickly check which evaluation tasks have not been completed for your model:
 
 ```bash
@@ -148,10 +151,65 @@ python scripts/check_missing.py
 
 <details>
 
-<summary>Figure Drawing</summary>
+<summary>2. Figure Drawing</summary>
 
 We provide all the scripts for drawing the figures in our paper in the folder ```figure_scripts```.
 We can easily change them to meet your own requirements.
+</details>
+
+<details>
+
+<summary>3. Data Filtering of Visual RAG</summary>
+
+We find that some file systems do not support double quotation marks in file names. 
+However, there are some images whose names have double quotations.
+We add a filter to remove those examples in the function `load_vrag(args, path, max_test_samples=None)` function in `data.py`.
+
+</details>
+
+
+<details>
+
+<summary>4. text_docqa_all.yaml and text_rag_all.yaml</summary>
+
+The ```text_docqa_all.yaml``` and ```text_rag_all.yaml``` are used in ablation studies in Table 6 (for w/ OCR and w/ LLM) and Table 7 (w/ name and w/ LLM) in our paper. You don't need them if you are just reimplementing the main results in Figure 1.
+
+</details>
+
+
+<details>
+
+<summary>5. Vision Token Counting</summary>
+
+Unlike text tokens, where the count remains relatively consistent across models, the number of vision tokens can vary dramatically. For the same image, one LVLM's vision encoder might generate several times as many tokens as another's, leading to significant discrepancies in total sequence length.
+
+The vision token counting in our paper follows the 14×14 patch with 2×2 pixel unshuffle, same as Qwen2.5-VL. Some LVLMs, however, produce far more vision tokens due to two factors:
+<b>1. Dynamic Tiling</b>: Some models (e.g., InternVL3, Phi-4-mini) split images into more tiles for small images, generating more tokens.
+<b>2. No Pixel Unshuffle</b>: Models without pixel unshuffle (e.g., Pixtral-12B) have 4× more tokens.
+To align token counts across models at 64K/128K lengths, we provide two arguments:
+1. `--image_resize` (e.g., --image_resize=0.5 reduces each side by half, making tokens 1/4)
+2. `--max_image_num` (limits the number of images per sample).
+
+<b>Note: For models with both dynamic tiling and no pixel unshuffle, token count cannot be reduced. See Appendix B.1 for details.</b>
+</details>
+
+<details>
+
+<summary>6. DocVQA page indices</summary>
+
+1. The indices in the `ans_page_list` field in each example means the page IDs in the original document, not the current (truncated or padded) page list page_list.
+
+2. Since we need to truncate or pad documents using Python, we use page indices starting from 0 in the `ans_page_list` field.
+
+3. Then, there is also a page index in the file names of each page:
+   - For SlideVQA, we keep the original image filenames (starting from 1). To get the correct page, use `ans_page_idx + 1`. Here is an example: for the data `slideVQA_0` in `slidevqa_K8.jsonl`, the answer page index is `"ans_page_list": [3]`. Thus, the filename should be "private-banking-wealth-management-what-clients-want-4-1024.jpg" (where 4 is 3 + 1).
+Thus, the page path should be "{deck name}-{page_idx + 1}-1024.jpg"
+
+    - For MMLongBench-Doc and LongDocURL: For this dataset, we extracted page images with filenames starting from 0, so you can use `ans_page_idx` directly. 
+   For example, the answer page index of "longdocurl_1" in "longdocurl_K8.jsonl" is 5.
+Thus, "4190345_page5.jpg" is the answer page.
+The general format is "{doc_name}_page{ans_page_idx}.jpg"
+
 </details>
 
 ## Contacts
