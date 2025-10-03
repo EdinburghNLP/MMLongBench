@@ -2,7 +2,7 @@
 
 ---
 <p align="center">
-    <strong>[Sept 2025]</strong> 🎉 MMLongBench is accepted as a <span style="color:red; font-weight:bold;">spotlight</span> at NeurIPS 2025!!!
+    <strong>[Sept 2025]</strong> 🎉 MMLongBench is accepted as a $${\color{red}spotlight}$$ at NeurIPS 2025!!!
 </p>
 
 <p align="center">
