@@ -433,7 +433,7 @@ def load_multi_lexsum(args, path, max_test_samples=None):
 
 def load_doc_qa(args, path, max_test_samples=None):
     user_template = "You are given a document with text and images, and a question. Answer the question as concisely as you can, using a single phrase or sentence if possible. If the question cannot be answered based on the information in the article, write 'Not answerable.' Write your answer in the following format:\nAnswer: [answer]\n\n{context}\n\nQuestion: {question}"
-    item_template = "Document {doc_id:.15} (page {page_id}): <image>"
+    item_template = "Document {doc_id:.15}: <image>" # remove  (page {page_id})
     system_template = "Answer:"
     prompt_template = user_template + "\n" + system_template
 
@@ -446,7 +446,7 @@ def load_doc_qa(args, path, max_test_samples=None):
     def update(sample):
         image_list = sample["page_list"]
         page_prompt_list = [item_template.format(
-            doc_id=image_path.split("/")[-2], page_id=image_path.split("page")[-1].split(".")[0]) for image_path in image_list]
+            doc_id=image_path.split("/")[-2]) for image_path in image_list]
         image_list = [os.path.join(args.image_file_root, image) for image in image_list]
         passage_text = "\n\n".join(page_prompt_list)
         question = sample["question"]
