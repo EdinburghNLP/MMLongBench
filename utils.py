@@ -349,7 +349,7 @@ def eval_docqa_score(gt, pred, answer_type):
 
 
 r_scorer = rouge_scorer.RougeScorer(['rougeL', 'rougeLsum'], use_stemmer=True)
-def calculate_metrics(prediction, answers, metrics):
+def calculate_metrics(prediction, answers, metrics, extra_info=None):
     metric_list = [m.strip() for m in metrics.split(",")]
     metric_res = {}
     if "sub_em" in metric_list:
@@ -390,8 +390,5 @@ def calculate_metrics(prediction, answers, metrics):
             metric_res[k + "_recall"] = max([r[k].recall for r in rouges])
 
     if "doc_qa" in metric_list:
-        answer, answer_type = answers
-        metric_res["doc_qa"] = eval_docqa_score(answer, prediction, answer_type)
-
+        metric_res["doc_qa"] = eval_docqa_score(answers, prediction, extra_info["answer_format"])
     return metric_res
-

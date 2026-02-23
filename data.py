@@ -462,11 +462,12 @@ def load_doc_qa(args, path, max_test_samples=None):
         Returns: metrics (dict) and additional info to update the original sample with (dict)
         """
         prediction = output["output"]
-        answer = [example["answer"], example["answer_format"]]
+        answer = example["answer"]
         parsed_pred = parse_output(prediction, prefix=system_template)
         if parsed_pred is None:
             parsed_pred = prediction
-        mets = calculate_metrics(parsed_pred, answer, "doc_qa")
+        mets = calculate_metrics(parsed_pred, answer, "doc_qa", 
+                                 extra_info={"answer_format": example["answer_format"]})
         return mets, {"parsed_output": parsed_pred}
 
     return {
