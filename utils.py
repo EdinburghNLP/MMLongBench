@@ -10,6 +10,8 @@ import unicodedata
 from math import isclose
 from collections import Counter
 from rouge_score import rouge_scorer
+from functools import partial
+from tqdm import tqdm
 
 import torch
 import logging
@@ -120,8 +122,8 @@ def get_top_tokens(logits, tokenizer, top_k=10):
 def parse_output(output, prefix="Answer:"):
     def lstrip_string(s, sub):
         return re.sub(f'^{re.escape(sub)}', '', s, flags=re.IGNORECASE)
-    patterns = [re.compile(f"(?:{prefix})(.*)(?:\n|$)", flags=re.IGNORECASE),  # prefix + answer + sentence end
-                re.compile(r"(?:^)(.*)(?:\n|$)")] # the beginning + answer + sentence end
+    patterns = [re.compile(f"(?:{prefix})(.*)", flags=re.IGNORECASE | re.DOTALL),  # prefix + answer + sentence end
+                re.compile(r"(?:^)(.*)", flags=re.IGNORECASE | re.DOTALL)] # the beginning + answer + sentence end
     for pat in patterns:
         matches = pat.search(output)
         if matches is not None:
@@ -348,6 +350,177 @@ def eval_docqa_score(gt, pred, answer_type):
     return float(score)
 
 
+def parse_judge_output(model_output):
+    result = {
+        "scoring_rationale": "",
+        "score": None,
+        "json_data": None,
+        "raw_output": model_output
+    }
+
+    try:
+        rationale_match = re.search(r'\[Scoring Rationale\]:(.*?)(?=\[Score\]:|\[JSON\]:|$)',
+                                   model_output, re.DOTALL)
+        if rationale_match:
+            result["scoring_rationale"] = rationale_match.group(1).strip()
+    except Exception as e:
+        print(f"解析rationale错误: {e}")
+        result["scoring_rationale"] = None
+
+    try:
+        score_match = re.search(r'\[Score\]:\s*(\d+)\s*points?', model_output)
+        if score_match:
+            result["score"] = int(score_match.group(1))
+
+    except Exception as e:
+        print(f"解析score错误: {e}")
+        result["score"] = None
+
+    result["json_data"] = robust_json_extraction(model_output, ["answer_score"])
+
+    return result
+
+
+def parse_list_judge_output(model_output):
+    result = {
+        "rationale": "",
+        "json_data": None,
+        "raw_output": model_output
+    }
+    try:
+        rationale_match = re.search(r'\[Rationale\]:(.*?)(?=\[JSON\]:|$)',
+                                   model_output, re.DOTALL)
+        if rationale_match:
+            result["rationale"] = rationale_match.group(1).strip()
+    except Exception as e:
+        print(f"解析Rationale错误: {e}")
+        result["rationale"] = None
+
+    result["json_data"] = robust_json_extraction(model_output, ["student_answer_count", "covered_count"])
+    return result
+
+def robust_json_extraction(text, key_list):
+    try:
+        match = re.search(r'\[JSON\]:.*?(\{)', text, re.DOTALL)
+        if match:
+            start_index = match.start(1)
+            decoder = json.JSONDecoder()
+            obj, _ = decoder.raw_decode(text[start_index:])
+            return obj
+    except Exception as e:
+        print(f"标准JSON解析失败: {e}。将尝试按key列表进行正则匹配: {key_list}。")
+
+    extracted_data = {}
+    for key in key_list:
+        try:
+            pattern = rf'"{key}"\s*:\s*(-?\d+(?:\.\d+)?)'
+
+            match = re.search(pattern, text)
+            if match:
+                value_str = match.group(1)
+                extracted_data[key] = float(value_str)
+        except Exception as e:
+            print(f"按key列表正则匹配{key}时发生错误: {e}")
+
+    return extracted_data
+
+
+def cover_key(json_data, key_list):
+    for key in key_list:
+        if key not in json_data:
+            return False
+    return True
+
+
+from utils_prompt import DOC_QA_JUDGE_PROMPT, CURRENT_CASE_PROMPT
+from utils_prompt import DOC_QA_LIST_F1_JUDGE_PROMPT, CURRENT_LIST_CASE_PROMPT
+from vlm_model.model_utils import call_api
+def eval_docqa_score_with_llm_judge(gt, pred, extra_info):
+    question = extra_info["question"]
+    prompt = DOC_QA_JUDGE_PROMPT + CURRENT_CASE_PROMPT.format(question=question, reference=gt, prediction=pred)
+    llm_judge_client = extra_info["llm_judge_client"]
+
+    func = partial(
+            llm_judge_client.chat.completions.create,
+            model=extra_info["llm_judge_model"],
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=256,
+        )
+
+    completion = call_api(func, limit=5, pause=5)
+
+    response = completion.choices[0].message.content
+
+    judge_result = parse_judge_output(response)
+
+    if judge_result["score"] is not None:
+        score = judge_result["score"]
+    elif judge_result["json_data"] is not None and "answer_score" in judge_result["json_data"]:
+        score = judge_result["json_data"]["answer_score"]
+    else:
+        score = 0.0
+
+    return {"final_score": score, "judge_result": judge_result}
+
+
+def eval_docqa_list_score_with_llm_judge(gt, pred, extra_info):
+    question = extra_info["question"]
+    prompt = DOC_QA_LIST_F1_JUDGE_PROMPT + CURRENT_LIST_CASE_PROMPT.format(question=question, reference=gt, prediction=pred)
+    llm_judge_client = extra_info["llm_judge_client"]
+
+    func = partial(
+            llm_judge_client.chat.completions.create,
+            model=extra_info["llm_judge_model"],
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=256,
+        )
+
+    completion = call_api(func, limit=5, pause=5)
+
+    response = completion.choices[0].message.content
+
+    judge_result = parse_list_judge_output(response)
+    if judge_result["json_data"] is not None and cover_key(judge_result["json_data"], ["student_answer_count", "covered_count"]):
+        student_answer_count = judge_result["json_data"]["student_answer_count"]
+        count = judge_result["json_data"]["covered_count"]
+        if count > 0:
+            recall = count / len(json.loads(gt))
+            precision = count / student_answer_count
+            score = max(min((2 * recall * precision) / (recall + precision), 1.0), 0.0)
+        else:
+            score = 0.0
+    else:
+        score = 0.0
+
+    return {"final_score": score, "judge_result": judge_result}
+
+
+def levenshtein_distance(s1, s2):
+    if len(s1) > len(s2):
+        s1, s2 = s2, s1
+
+    distances = range(len(s1) + 1)
+    for i2, c2 in tqdm(enumerate(s2), desc="iterating s2"):
+        distances_ = [i2 + 1]
+        for i1, c1 in enumerate(s1):
+            if c1 == c2:
+                distances_.append(distances[i1])
+            else:
+                distances_.append(1 + min((distances[i1], distances[i1 + 1], distances_[-1])))
+        distances = distances_
+    return distances[-1]
+
+
+def anls_compute(prediction, groundtruth, threshold=-1):
+    dist = levenshtein_distance(groundtruth, prediction)
+    length = max(len(groundtruth.upper()), len(prediction.upper()))
+    value = 0.0 if length == 0 else float(dist) / float(length)
+    anls = 1.0 - value
+    if anls<=threshold:
+        anls = 0.0
+    return anls
+
+
 r_scorer = rouge_scorer.RougeScorer(['rougeL', 'rougeLsum'], use_stemmer=True)
 def calculate_metrics(prediction, answers, metrics, extra_info=None):
     metric_list = [m.strip() for m in metrics.split(",")]
@@ -391,4 +564,14 @@ def calculate_metrics(prediction, answers, metrics, extra_info=None):
 
     if "doc_qa" in metric_list:
         metric_res["doc_qa"] = eval_docqa_score(answers, prediction, extra_info["answer_format"])
+
+    if "doc_qa_llm" in metric_list:
+        if extra_info["answer_format"] == "List":
+            metric_res["doc_qa_llm"] = eval_docqa_list_score_with_llm_judge(answers, prediction, extra_info=extra_info)
+        else:
+            metric_res["doc_qa_llm"] = eval_docqa_score_with_llm_judge(answers, prediction, extra_info=extra_info)
+
+    if "anls" in metric_list:
+        metric_res["anls"] = anls_compute(prediction, answers, threshold=-1)
+
     return metric_res

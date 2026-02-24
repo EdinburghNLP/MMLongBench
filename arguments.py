@@ -18,7 +18,7 @@ def parse_arguments():
     parser.add_argument("--image_file_root", type=str, default=None)
     parser.add_argument("--test_files", type=str, default=None)
     parser.add_argument("--output_dir", type=str, default=None, help="path to save the predictions")
-    parser.add_argument("--overwrite", action="store_true", help="whether to the saved file")
+    parser.add_argument("--overwrite", action="store_true", help="whether to overwrite the existing output files")
     parser.add_argument("--max_test_samples", type=int, default=None)
     parser.add_argument("--num_workers", type=int, default=32)
     parser.add_argument("--preprocessing_num_workers", type=int, default=8)
@@ -26,6 +26,11 @@ def parse_arguments():
     # evaluation settings
     parser.add_argument("--input_max_length", type=str, default='8192', help="the maximum number of tokens of the input, we truncate the end of the context; can be separated by comma to match the specified datasets")
     parser.add_argument("--test_length", type=str, default="4,8,16,32,64,128", help="list the length to be tested.")
+    parser.add_argument("--docqa_llm_judge", type=ast.literal_eval, choices=[True, False], default=True, help="whether to use llm judge as the metric for docqa")
+    parser.add_argument("--llm_judge_type", type=str, default="azure", choices=["azure", "openai"])
+    parser.add_argument("--llm_judge_model", type=str, default="Doubao-Seed-1.8")
+    parser.add_argument("--llm_judge_key", type=str, default=None)
+    parser.add_argument("--llm_judge_endpoint", type=str, default=None)
 
     # generation settings
     parser.add_argument("--do_sample", type=ast.literal_eval, choices=[True, False], default=False, help="whether to use sampling (false is greedy), overwrites temperature")
@@ -41,7 +46,7 @@ def parse_arguments():
     parser.add_argument("--no_cuda", action="store_true", help="disable cuda")
     parser.add_argument("--no_bf16", action="store_true", help="disable bf16 and use fp32")
     parser.add_argument("--load_in_8bit", action="store_true", help="int8 mode")
-    parser.add_argument("--no_torch_compile", action="store_true", help="disable cuda")
+    parser.add_argument("--no_torch_compile", action="store_true", help="disable torch.compile for faster startup")
     parser.add_argument("--use_chat_template", type=ast.literal_eval, choices=[True, False], default=True, help="whether to use chat template")
     parser.add_argument("--rope_theta", type=int, default=None, help="override rope theta")
     parser.add_argument("--use_yarn", action="store_true", help="yarn extension")

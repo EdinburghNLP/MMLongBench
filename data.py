@@ -466,9 +466,83 @@ def load_doc_qa(args, path, max_test_samples=None):
         parsed_pred = parse_output(prediction, prefix=system_template)
         if parsed_pred is None:
             parsed_pred = prediction
-        mets = calculate_metrics(parsed_pred, answer, "doc_qa", 
+        mets = calculate_metrics(parsed_pred, answer, "doc_qa",
                                  extra_info={"answer_format": example["answer_format"]})
         return mets, {"parsed_output": parsed_pred}
+
+    return {
+        "data": data,
+        "prompt_template": prompt_template,
+        "user_template": user_template,
+        "system_template": system_template,
+        "post_process": docqa_post_process
+    }
+
+
+def get_llm_judge_client(args):
+    """return the LLM judge client"""
+    import openai
+    api_key = args.llm_judge_key or os.getenv("LLM_JUDGE_KEY")
+    endpoint = args.llm_judge_endpoint or os.getenv("LLM_JUDGE_ENDPOINT")
+    
+    if not api_key:
+        raise ValueError("LLM Judge Key is missing. Please set --llm_judge_key or export LLM_JUDGE_KEY")
+
+    if args.llm_judge_type == "azure":
+        return openai.AzureOpenAI(
+            api_key=api_key,
+            azure_endpoint=endpoint,
+            api_version="2024-03-01-preview", # TODO remember to comment this line
+        )
+    else:
+        return openai.OpenAI(api_key=api_key, base_url=endpoint)
+
+
+def load_doc_qa_with_llm_judge(args, path, max_test_samples=None):
+    user_template = "You are given a document with text and images, and a question. Answer the question as concisely as you can, using a single phrase or sentence if possible. If the question cannot be answered based on the information in the article, write 'Not answerable.' Write your answer in the following format:\nAnswer: [answer]\n\n{context}\n\nQuestion: {question}"
+    item_template = "Document {doc_id:.15}: <image>" # remove  (page {page_id})
+    system_template = "Answer:"
+    prompt_template = user_template + "\n" + system_template
+
+    path = os.path.join(args.test_file_root, path)
+    data = load_dataset("json", data_files=path)["train"]
+
+    if max_test_samples is not None:
+        data = data.shuffle(seed=args.seed).select(range(min(len(data), max_test_samples)))
+
+    def update(sample):
+        image_list = sample["page_list"]
+        page_prompt_list = [item_template.format(
+            doc_id=image_path.split("/")[-2]) for image_path in image_list]
+        image_list = [os.path.join(args.image_file_root, image) for image in image_list]
+        passage_text = "\n\n".join(page_prompt_list)
+        question = sample["question"]
+        doc_id = sample["doc_name"]
+        question = "Based on Document {doc_id:.15}, answer the following question. ".format(doc_id=doc_id) + question
+
+        return {"context": passage_text, "image_list": image_list, "question": question}
+
+    data = data.map(update, num_proc=args.preprocessing_num_workers)
+
+    llm_judge_client = get_llm_judge_client(args)
+
+    def docqa_post_process(output, example):
+        """
+        Returns: metrics (dict) and additional info to update the original sample with (dict)
+        """
+        prediction = output["output"]
+        answer = example["answer"]
+        parsed_pred = parse_output(prediction, prefix=system_template)
+        if parsed_pred is None:
+            parsed_pred = prediction
+        mets = calculate_metrics(parsed_pred, answer, "doc_qa_llm",
+                                 extra_info={"llm_judge_client": llm_judge_client,
+                                             "llm_judge_model": args.llm_judge_model,
+                                             "answer_format": example["answer_format"],
+                                             "question": example["question"]})
+        judge_result = mets["doc_qa_llm"]["judge_result"]
+        mets["doc_qa_llm"] = mets["doc_qa_llm"]["final_score"]
+        return mets, {"parsed_output": parsed_pred, "judge_result": judge_result}
 
     return {
         "data": data,
@@ -556,12 +630,15 @@ def load_data(args, dataset, path=None):
     elif "lexsum" in dataset:
         data = load_multi_lexsum(args, path, max_test_samples=args.max_test_samples)
     elif any(key in dataset for key in ["longdocurl", "mmlongdoc", "slidevqa"]):
-        data = load_doc_qa(args, path, max_test_samples=args.max_test_samples)
+        if args.docqa_llm_judge:
+            data = load_doc_qa_with_llm_judge(args, path, max_test_samples=args.max_test_samples)
+        else:
+            data = load_doc_qa(args, path, max_test_samples=args.max_test_samples)
     elif dataset == "text_doc":
         data = load_text_doc_qa(args, path, max_test_samples=args.max_test_samples)
     else:
         raise ValueError(f"Unknown dataset {dataset}")
-    
+
     return data
 
 

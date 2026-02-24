@@ -100,38 +100,37 @@ def run_test(args, model, dataset, test_file):
     remaining_indices = list(range(len(results), len(data["data"])))
     remaining_samples = len(remaining_indices)
     logger.info(f"Processing {remaining_samples} remaining samples with {args.batch_size} workers")
+    print(remaining_indices)
 
     with ThreadPoolExecutor(max_workers=args.batch_size) as executor:
         try:
-            for start_idx in tqdm(range(0, remaining_samples, args.batch_size)):
-                current_indices = remaining_indices[start_idx: start_idx + args.batch_size]
-                print(current_indices)
-                futures = [executor.submit(process_single_item, i) for i in current_indices]
-                for future in futures:
-                    result = future.result()
+            futures = [executor.submit(process_single_item, i) for i in remaining_indices]
+            for future in tqdm(futures, f"{args.model_name_or_path} processing {test_name}"):
 
-                    idx, result_dict, mets, input_len, output_len, input_text = result
+                result = future.result()
 
-                    if result_dict["parsed_output"] != "":
-                        for k, v in mets.items():
-                            metrics[k].append(v)
-                        metrics["input_len"].append(input_len)
-                        metrics["output_len"].append(output_len)
-                    else:
-                        logger.info(f"skipping example {idx + 1} because the model returned empty string")
+                idx, result_dict, mets, input_len, output_len, input_text = result
 
-                    results.append(result_dict)
-                    fout.write(json.dumps(result_dict) + "\n")
-                    fout.flush()
+                if result_dict["parsed_output"] != "":
+                    for k, v in mets.items():
+                        metrics[k].append(v)
+                    metrics["input_len"].append(input_len)
+                    metrics["output_len"].append(output_len)
+                else:
+                    logger.info(f"skipping example {idx + 1} because the model returned empty string")
 
-                    if idx < 2 or args.debug:
-                        logger.info(f"Example {idx + 1}: ")
-                        logger.info(f"Decoder inputs:\n{input_text}\n")
-                        logger.info(f"Input length: {input_len}")
-                        logger.info(f"Question: {result_dict['question'] if 'question' in result_dict else ''}")
-                        logger.info(f"Answer: {result_dict['answer'] if 'answer' in result_dict else ''}")
-                        logger.info(f"Output: {result_dict['output']}")
-                        logger.info(f"Parsed output: {result_dict['parsed_output']}")
+                results.append(result_dict)
+                fout.write(json.dumps(result_dict) + "\n")
+                fout.flush()
+
+                if idx < 2 or args.debug:
+                    logger.info(f"Example {idx + 1}: ")
+                    logger.info(f"Decoder inputs:\n{input_text}\n")
+                    logger.info(f"Input length: {input_len}")
+                    logger.info(f"Question: {result_dict['question'] if 'question' in result_dict else ''}")
+                    logger.info(f"Answer: {result_dict['answer'] if 'answer' in result_dict else ''}")
+                    logger.info(f"Output: {result_dict['output']}")
+                    logger.info(f"Parsed output: {result_dict['parsed_output']}")
         finally:
             if 'futures' in locals():
                 for future in futures:

@@ -1,4 +1,5 @@
 import torch
+import os
 
 
 def load_LLM(args):
@@ -9,6 +10,9 @@ def load_LLM(args):
     elif "gemini" in args.model_name_or_path:
         from .gemini import GeminiModel
         model_cls = GeminiModel
+    elif args.use_vllm:
+        from .vllm_models import VLLMModel
+        model_cls = VLLMModel
     else:
         # HF models
         lower_model_name = args.model_name_or_path.lower().split("/")[-1]
