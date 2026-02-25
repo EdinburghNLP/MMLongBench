@@ -28,7 +28,7 @@ Please check out the paper for more details, and this repo will detail how to ru
 ## 📢 Latest Updates
 
 - **[Feb 24, 2026]** 🚀 **Release MMLongBench V1.1 with Enhanced LLM-based Evaluation and vLLM Support:**
-- **[Dec 18, 2025]** 🌟 [**Seed-2.0**](https://seed.bytedance.com/en/seed2) has used our MMLongBench v1.1 as the benchmark of multimodal long context.
+- **[Feb 14, 2026]** 🌟 [**Seed-2.0**](https://seed.bytedance.com/en/seed2) has used our MMLongBench v1.1 as the benchmark of multimodal long context.
 - **[Dec 18, 2025]** 🌟 [**Seed-1.8**](https://seed.bytedance.com/en/seed1_8) has used our MMLongBench as the benchmark of multimodal long context.
 - **[Dec 7, 2025]** 🌟 [**GLM-4.6V**](https://huggingface.co/zai-org/GLM-4.6V) has used our MMLongBench as the benchmark of multimodal long context.
 - **[Aug 7, 2025]** 🌟 [**MiMo-VL**](https://huggingface.co/XiaomiMiMo/MiMo-VL-7B-SFT-2508) has used our MMLongBench as the benchmark of multimodal long context.
