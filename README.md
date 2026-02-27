@@ -25,8 +25,17 @@ MMLongBench is a comprehensive benchmark covering a diverse set of long-context 
 It is composed of 13,331 examples spanning five different categories of downstream tasks, including Visual RAG, NIAH, Many-Shot ICL, Summarization (based on PDF documents), and Long-Document VQA.
 Please check out the paper for more details, and this repo will detail how to run the evaluation.
 
+## 📢 Latest Updates
+
+- **[Feb 24, 2026]** 🚀 **Release MMLongBench V1.1 with Enhanced LLM-based Evaluation and vLLM Support:**
+- **[Feb 14, 2026]** 🌟 [**Seed-2.0**](https://seed.bytedance.com/en/seed2) has used our MMLongBench v1.1 as the benchmark of multimodal long context.
+- **[Dec 18, 2025]** 🌟 [**Seed-1.8**](https://seed.bytedance.com/en/seed1_8) has used our MMLongBench as the benchmark of multimodal long context.
+- **[Dec 7, 2025]** 🌟 [**GLM-4.6V**](https://huggingface.co/zai-org/GLM-4.6V) has used our MMLongBench as the benchmark of multimodal long context.
+- **[Aug 7, 2025]** 🌟 [**MiMo-VL**](https://huggingface.co/XiaomiMiMo/MiMo-VL-7B-SFT-2508) has used our MMLongBench as the benchmark of multimodal long context.
+
 ## Quick Links
 
+- [v1.1 Update](#v11-update)
 - [Setup](#setup)
 - [Data](#data)
 - [Running evaluation](#running-evaluation)
@@ -36,6 +45,27 @@ Please check out the paper for more details, and this repo will detail how to ru
 - [Contacts](#contacts)
 - [Acknowledgment](#acknowledgment)
 
+
+## v1.1 Update
+
+- **LLM-based evaluation for DocVQA:** We have introduced an LLM-based evaluation metric for DocVQA tasks including `mmlongdoc`, `longdocurl`, and `slidevqa`. This update addresses the limitations of rule-based metrics by using a judge to evaluate semantic accuracy and list-completions.
+    - For **Integer, Float, and String** types, we employ an LLM to directly evaluate the correctness of the predicted answers (binary). For **List** type answers, we utilize specialized prompts and a robust F1-score calculation to ensure high-quality assessment.
+    - **Quick Start**: Use `--docqa_llm_judge True` and set your `--llm_judge_key` to enable this feature, as following:
+    
+  ```bash
+  python eval_api_batch.py --config configs/docqa_all.yaml --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
+  --output_dir /your_own_path/debug_res_dir/Qwen2.5-VL-3B-Instruct_llm_judge_vllm \
+  --test_file_root /your_own_path/MMLongBench/mmlb_data \
+  --image_file_root /your_own_path/MMLongBench/mmlb_image \
+  --num_workers 32 --preprocessing_num_workers 8 --test_length 128 --use_vllm --batch_size 16 \
+  --docqa_llm_judge True --llm_judge_key xxx --llm_judge_endpoint yyy --llm_judge_model Doubao-Seed-1.8
+  ```
+- **vLLM support:** To better handle long-context evaluation, we have integrated vLLM as a high-speed inference backend. This provides better memory management (via PagedAttention) and higher throughput.
+    - **Quick Start**: Serve your model with vLLM first. Then, simply add the `--use_vllm` flag to your evaluation command to call the vLLM engine (such as the above command).
+    - Here is an example of serving `Qwen2.5-VL-3B-Instruct`
+```bash
+VLLM_ALLOW_LONG_MAX_MODEL_LEN=1 vllm serve Qwen/Qwen2.5-VL-3B-Instruct   --host 0.0.0.0 --port 8000 --tensor-parallel-size 4   --trust-remote-code --limit-mm-per-prompt '{"image": 800,"video":0}'   --max-model-len 139264 --gpu-memory-utilization 0.95   --enforce-eager --allowed-local-media-path /
+```
 
 ## Setup
 
