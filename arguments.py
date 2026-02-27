@@ -58,7 +58,7 @@ def parse_arguments():
     parser.add_argument("--api_sleep", type=int, default=None, help="the sleep time for API models after each call")
     parser.add_argument("--max_image_size", type=int, default=None, help="Max image size for Gemini to prevent over resizing and splitting")
     parser.add_argument("--image_detail", type=str, choices=["high", "low", "auto"], default="auto", help="Image detail for OpenAI models")
-    parser.add_argument("--batch_size", type=int, default=4, help="inference batch size. This is only effective for OpenAI models now!")
+    parser.add_argument("--batch_size", type=int, default=4, help="inference batch size. This is only effective for API models now!")
     parser.add_argument("--v2pe_step", type=int, default=64, help="the increment size for visual tokens in V2PE")
 
     # misc
