@@ -267,3 +267,7 @@ The main difference is that, since LVLMs have non-unified function APIs, we writ
 ## Misuse for malicious purposes
 This dataset is constructed to support the development of Long-Context Vision-Language Models. It is strictly forbidden to use this dataset for other usage with high risk, such as generating or disseminating false, misleading, or harmful content, or for activities involving privacy violation, fraud, discrimination, harassment, violence, pornography, or any illegal purposes. Users must not use this dataset to train, fine-tune, or deploy any models or applications that violate laws, regulations, or ethical standards. By using this dataset, you agree to bear all legal and ethical responsibilities resulting from any misuse.
 
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=EdinburghNLP/MMLongBench&type=Timeline)](https://github.com/EdinburghNLP/MMLongBench/stargazers)
