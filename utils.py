@@ -444,7 +444,7 @@ def eval_docqa_score_with_llm_judge(gt, pred, extra_info):
             llm_judge_client.chat.completions.create,
             model=extra_info["llm_judge_model"],
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=256,
+            max_tokens=1024,
         )
 
     completion = call_api(func, limit=5, pause=5)
@@ -472,7 +472,7 @@ def eval_docqa_list_score_with_llm_judge(gt, pred, extra_info):
             llm_judge_client.chat.completions.create,
             model=extra_info["llm_judge_model"],
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=256,
+            max_tokens=1024,
         )
 
     completion = call_api(func, limit=5, pause=5)
