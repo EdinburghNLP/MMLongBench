@@ -2,6 +2,8 @@
 
 ---
 <p align="center">
+    <strong>[Jul 2026]</strong> 🎉 Our dataset has been integrated into <a href="https://github.com/open-compass/VLMEvalKit/pull/1592">VLMEvalKit</a>!!!
+    <br>
     <strong>[Sept 2025]</strong> 🎉 MMLongBench is accepted as a $${\color{red}spotlight}$$ at NeurIPS 2025!!!
 </p>
 
@@ -27,6 +29,7 @@ Please check out the paper for more details, and this repo will detail how to ru
 
 ## 📢 Latest Updates
 
+- **[Jul 3, 2026]** 🎉 Our dataset has been integrated into [**VLMEvalKit**](https://github.com/open-compass/VLMEvalKit/pull/1592)!!! The VLMEvalKit-formatted TSV files are available on [Hugging Face](https://huggingface.co/datasets/ZhaoweiWang/MMLongBench/tree/main/vlmevalkit), and related discussion is in [GitHub Issue #11](https://github.com/EdinburghNLP/MMLongBench/issues/11).
 - **[Feb 24, 2026]** 🚀 **Release MMLongBench V1.1 with Enhanced LLM-based Evaluation and vLLM Support:**
 - **[Feb 14, 2026]** 🌟 [**Seed-2.0**](https://seed.bytedance.com/en/seed2) has used our MMLongBench v1.1 as the benchmark of multimodal long context.
 - **[Dec 18, 2025]** 🌟 [**Seed-1.8**](https://seed.bytedance.com/en/seed1_8) has used our MMLongBench as the benchmark of multimodal long context.
