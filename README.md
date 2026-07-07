@@ -2,7 +2,7 @@
 
 ---
 <p align="center">
-    <strong>[Jul 2026]</strong> Our dataset has been integrated into <a href="https://github.com/open-compass/VLMEvalKit/pull/1592">VLMEvalKit.</a>
+    <strong>[Jul 2026]</strong> Our dataset has been integrated into <a href="https://github.com/open-compass/VLMEvalKit/pull/1592">VLMEvalKit</a>.
     <br>
     <strong>[Sept 2025]</strong> 🎉 MMLongBench is accepted as a $${\color{red}spotlight}$$ at NeurIPS 2025!!!
 </p>
