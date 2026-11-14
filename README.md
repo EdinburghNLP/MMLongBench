@@ -72,9 +72,14 @@ VLLM_ALLOW_LONG_MAX_MODEL_LEN=1 vllm serve Qwen/Qwen2.5-VL-3B-Instruct   --host 
 
 ## Setup
 
-Please install the necessary packages with (using a virtual environment with anaconda is recommended, tested with python 3.11):
+Use Python 3.11 or newer for the patched Pillow dependency. A virtual environment such as Conda is recommended; the setup was tested with Python 3.11.
 ```bash
 pip install -r requirements.txt
+```
+
+For existing environments, also upgrade Pillow to fix [CVE-2026-128067](https://github.com/advisories/GHSA-xcvg-w56q-r89m):
+```bash
+pip install --upgrade "pillow>=13.0.0,<14"
 ```
 
 if you wish to use API models, you need to install the corresponding packages.

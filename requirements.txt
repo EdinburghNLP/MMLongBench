@@ -1,4 +1,5 @@
 rouge_score==0.1.2
+pillow>=13.0.0,<14 # fixes CVE-2026-128067
 transformers==4.49.0 # Gemma3 needs 4.50
 datasets==3.1.0
 accelerate==1.2.0
